@@ -16,7 +16,9 @@ import { mongoExistsType } from 'src/common/types';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private readonly userModel: Model<User>,
+  ) {}
 
   public async hashPassword(
     password: string,
@@ -42,7 +44,7 @@ export class UsersService {
     }
   }
 
-  async create(createUserDto: CreateUserDto): Promise<UserResponse> {
+  public async create(createUserDto: CreateUserDto): Promise<UserResponse> {
     await this.checkNewLogin(createUserDto.login);
 
     const createdUser = new this.userModel({
@@ -56,7 +58,7 @@ export class UsersService {
     return User.getResponse(createdUser.toObject());
   }
 
-  async findAll(paginationDto: PaginationDto): Promise<UserResponse[]> {
+  public async findAll(paginationDto: PaginationDto): Promise<UserResponse[]> {
     const page = (paginationDto.page && +paginationDto.page) || 1;
     const size = (paginationDto.size && +paginationDto.size) || 100;
     const offset = (page - 1) * size;
@@ -66,7 +68,7 @@ export class UsersService {
     return users.map((user) => User.getResponse(user.toObject()));
   }
 
-  async findOne<T = UserResponse | User>(
+  public async findOne<T = UserResponse | User>(
     id: string,
     toResponse = true,
   ): Promise<T> {
@@ -93,7 +95,7 @@ export class UsersService {
     return user.toObject();
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
+  public async update(id: string, updateUserDto: UpdateUserDto) {
     const user = await this.findOne<User>(id, false);
 
     const {
@@ -124,7 +126,7 @@ export class UsersService {
     return User.getResponse(updatedUser.toObject());
   }
 
-  async remove(id: string): Promise<UserResponse> {
+  public async remove(id: string): Promise<UserResponse> {
     const deletedUser = await this.userModel
       .findByIdAndDelete({ _id: id })
       .exec();

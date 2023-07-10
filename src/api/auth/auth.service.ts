@@ -21,14 +21,14 @@ export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly usersService: UsersService,
-    @InjectModel(Auth.name) private authModel: Model<Auth>,
+    @InjectModel(Auth.name) private readonly authModel: Model<Auth>,
   ) {}
 
   public async signUp(signUpDto: SignUpDto): Promise<void> {
     await this.usersService.create(signUpDto);
   }
 
-  async validateUser(
+  public async validateUser(
     signInDto: Omit<SignInDto, 'fingerprint'>,
   ): Promise<UserResponse | null> {
     const user = await this.usersService.findOneByLogin(signInDto.login);
@@ -42,7 +42,9 @@ export class AuthService {
     return null;
   }
 
-  async validateIfUserStillExists(login: string): Promise<UserResponse | null> {
+  public async validateIfUserStillExists(
+    login: string,
+  ): Promise<UserResponse | null> {
     return this.usersService.findOneByLogin(login);
   }
 

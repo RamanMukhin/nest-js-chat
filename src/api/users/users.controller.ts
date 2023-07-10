@@ -10,7 +10,6 @@ import {
   HttpStatus,
   Query,
   UseGuards,
-  Request,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 // import { CreateUserDto } from './dto/create-user.dto';
@@ -24,7 +23,6 @@ import {
 import { UserResponse } from './responses/user.response';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { JwtAuthGuard } from '../auth/utils/jwt-auth.quard';
-import { RequestWithUser } from 'src/common/custom.request';
 
 @ApiTags('users')
 @ApiBearerAuth()
