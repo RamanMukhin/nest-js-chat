@@ -4,7 +4,13 @@ import { User } from 'src/api/users/entities/user.entity';
 
 export type RoomDocument = HydratedDocument<Room>;
 
-@Schema({ versionKey: false, timestamps: true })
+@Schema({
+  versionKey: false,
+  timestamps: true,
+  toObject: { virtuals: true },
+  toJSON: { virtuals: true },
+  id: false,
+})
 export class Room extends Document {
   @Prop()
   _id: string;
@@ -25,4 +31,13 @@ export class Room extends Document {
   updatedAt: string;
 }
 
-export const RoomSchema = SchemaFactory.createForClass(Room);
+const RoomSchema = SchemaFactory.createForClass(Room);
+
+RoomSchema.virtual('messages', {
+  ref: 'Message',
+  foreignField: 'roomId',
+  localField: '_id',
+  justOne: false,
+});
+
+export { RoomSchema };

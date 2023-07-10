@@ -50,8 +50,11 @@ export class RoomsController {
 
   @Get(':id')
   @ApiOkResponse({ type: RoomResponse })
-  findOne(@Param('id') id: string): Promise<RoomResponse> {
-    return this.roomsService.findOne(id);
+  findOne(
+    @Param('id') id: string,
+    @Query() paginationDto: PaginationDto,
+  ): Promise<RoomResponse> {
+    return this.roomsService.findOne(id, paginationDto);
   }
 
   @Patch(':id')

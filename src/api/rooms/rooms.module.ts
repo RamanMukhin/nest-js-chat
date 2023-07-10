@@ -10,5 +10,6 @@ import { Room, RoomSchema } from './entities/room.entity';
   ],
   controllers: [RoomsController],
   providers: [RoomsService],
+  exports: [RoomsService],
 })
 export class RoomsModule {}
