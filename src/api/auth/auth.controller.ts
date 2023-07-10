@@ -28,7 +28,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('/sign-up')
-  public signUp(@Body() signUpDto: SignUpDto) {
+  public signUp(@Body() signUpDto: SignUpDto): Promise<void> {
     return this.authService.signUp(signUpDto);
   }
 
@@ -36,14 +36,17 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @ApiOkResponse({ type: AuthResponse })
   @HttpCode(HttpStatus.OK)
-  public signIn(@Request() req: RequestWithUser, @Body() signInDto: SignInDto) {
+  public signIn(
+    @Request() req: RequestWithUser,
+    @Body() signInDto: SignInDto,
+  ): Promise<AuthResponse> {
     return this.authService.signIn(signInDto.fingerprint, req.user);
   }
 
-  @ApiOkResponse({ type: AuthResponse })
-  @UseGuards(JwtRefreshAuthGuard)
-  @HttpCode(HttpStatus.OK)
   @Post('/refresh')
+  @UseGuards(JwtRefreshAuthGuard)
+  @ApiOkResponse({ type: AuthResponse })
+  @HttpCode(HttpStatus.OK)
   public mobileRefresh(
     @Body() refreshTokenDto: RefreshTokenDto,
     @Req() req: RequestWithUser,
@@ -57,9 +60,9 @@ export class AuthController {
     );
   }
 
+  @Post('/logout')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  @Post('/logout')
   public logoutUser(
     @Req() req: RequestWithUser,
     @Body() logoutDto: LogoutDto,

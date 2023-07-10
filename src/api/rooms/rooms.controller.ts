@@ -15,10 +15,16 @@ import {
 import { RoomsService } from './rooms.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
-import { ApiBearerAuth, ApiNoContentResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiNoContentResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/utils/jwt-auth.quard';
 import { RequestWithUser } from 'src/common/custom.request';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { RoomResponse } from './responses/room.response';
 
 @ApiTags('rooms')
 @ApiBearerAuth()
@@ -28,29 +34,39 @@ export class RoomsController {
   constructor(private readonly roomsService: RoomsService) {}
 
   @Post()
-  create(@Req() req: RequestWithUser, @Body() createRoomDto: CreateRoomDto) {
+  @ApiOkResponse({ type: RoomResponse })
+  create(
+    @Req() req: RequestWithUser,
+    @Body() createRoomDto: CreateRoomDto,
+  ): Promise<RoomResponse> {
     return this.roomsService.create(createRoomDto, req.user._id);
   }
 
   @Get()
-  findAll(@Query() paginationDto: PaginationDto) {
+  @ApiOkResponse({ type: [RoomResponse] })
+  findAll(@Query() paginationDto: PaginationDto): Promise<RoomResponse[]> {
     return this.roomsService.findAll(paginationDto);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  @ApiOkResponse({ type: RoomResponse })
+  findOne(@Param('id') id: string): Promise<RoomResponse> {
     return this.roomsService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRoomDto: UpdateRoomDto) {
+  @ApiOkResponse({ type: RoomResponse })
+  update(
+    @Param('id') id: string,
+    @Body() updateRoomDto: UpdateRoomDto,
+  ): Promise<RoomResponse> {
     return this.roomsService.update(id, updateRoomDto);
   }
 
   @Delete(':id')
   @ApiNoContentResponse()
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: string): Promise<RoomResponse> {
     return this.roomsService.remove(id);
   }
 }

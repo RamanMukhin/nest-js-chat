@@ -33,32 +33,35 @@ export class UsersController {
 
   // @Post()
   // @ApiOkResponse({ type: UserResponse })
-  // create(@Body() createUserDto: CreateUserDto) {
+  // create(@Body() createUserDto: CreateUserDto): Promise<UserResponse> {
   //   return this.usersService.create(createUserDto);
   // }
 
   @Get()
   @ApiOkResponse({ type: [UserResponse] })
-  findAll(@Query() paginationDto: PaginationDto) {
+  findAll(@Query() paginationDto: PaginationDto): Promise<UserResponse[]> {
     return this.usersService.findAll(paginationDto);
   }
 
   @Get(':id')
   @ApiOkResponse({ type: UserResponse })
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: string): Promise<UserResponse> {
     return this.usersService.findOne<UserResponse>(id);
   }
 
   @Patch(':id')
   @ApiOkResponse({ type: UserResponse })
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<UserResponse> {
     return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
   @ApiNoContentResponse()
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: string): Promise<UserResponse> {
     return this.usersService.remove(id);
   }
 }
