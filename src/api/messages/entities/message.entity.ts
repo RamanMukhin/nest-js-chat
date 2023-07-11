@@ -30,4 +30,9 @@ export class Message extends Document {
   updatedAt: string;
 }
 
-export const MessageSchema = SchemaFactory.createForClass(Message);
+const MessageSchema = SchemaFactory.createForClass(Message);
+
+MessageSchema.index({ name: 'text', data: 'text' });
+MessageSchema.index({ data: 1 });
+
+export { MessageSchema };

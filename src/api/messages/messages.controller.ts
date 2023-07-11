@@ -23,8 +23,8 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/utils/jwt-auth.quard';
 import { RequestWithUser } from 'src/common/custom.request';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { MessageResponse } from './responses/message.response';
+import { SearchInMessageWitPaginationDto } from './dto/search-in-message.dto';
 
 @ApiTags('messages')
 @ApiBearerAuth()
@@ -44,8 +44,10 @@ export class MessagesController {
 
   @Get()
   @ApiOkResponse({ type: [MessageResponse] })
-  findAll(@Query() paginationDto: PaginationDto): Promise<MessageResponse[]> {
-    return this.messagesService.findAll(paginationDto);
+  findAll(
+    @Query() searchInMessageWitPaginationDto: SearchInMessageWitPaginationDto,
+  ): Promise<MessageResponse[]> {
+    return this.messagesService.findAll(searchInMessageWitPaginationDto);
   }
 
   @Get(':id')

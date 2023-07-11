@@ -8,9 +8,9 @@ import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Message } from './entities/message.entity';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { RETURN_NEW_OPTION } from 'src/common/constants';
 import { RoomsService } from '../rooms/rooms.service';
+import { SearchInMessageWitPaginationDto } from './dto/search-in-message.dto';
 
 @Injectable()
 export class MessagesService {
@@ -48,13 +48,35 @@ export class MessagesService {
     return createdMessage;
   }
 
-  public async findAll(paginationDto: PaginationDto): Promise<Message[]> {
-    const page = (paginationDto.page && +paginationDto.page) || 1;
-    const size = (paginationDto.size && +paginationDto.size) || 100;
+  public async findAll(
+    searchInMessageWitPaginationDto: SearchInMessageWitPaginationDto,
+  ): Promise<Message[]> {
+    const page =
+      (searchInMessageWitPaginationDto.page &&
+        +searchInMessageWitPaginationDto.page) ||
+      1;
+    const size =
+      (searchInMessageWitPaginationDto.size &&
+        +searchInMessageWitPaginationDto.size) ||
+      100;
     const offset = (page - 1) * size;
 
+    const { search: searchString } = searchInMessageWitPaginationDto;
+
+    const filter = searchString
+      ? {
+          $or:
+            searchString.length >= +(process.env.MIN_TEXT_SEARCH_LENGTH ?? 3)
+              ? [
+                  { $text: { $search: searchString } },
+                  { data: { $regex: searchString } },
+                ]
+              : [{ $text: { $search: searchString } }],
+        }
+      : {};
+
     const messages = await this.messageModel
-      .find()
+      .find(filter)
       .limit(size)
       .skip(offset)
       .exec();
