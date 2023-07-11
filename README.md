@@ -8,7 +8,7 @@
 $ npm install
 ```
 
-Provide your **mongo db connection url** as an enviroment variabel **DATABASE_HOST**. If you don't have mongoDB installed locally, and don't have accaunt on MongoDB Atlas with cloude managed database, your can deploy mongoDB locally using **docker** (you should have **already installed docker, docker-compose**). To perform it, **first of all** create in root dir **.env** file like **.env.example** (**just copy data from .env.example to .env**) and **then** in the project **root** dir run:
+Create .env like .env.example, all variable are required. Provide your **mongo db connection url** as an enviroment variabel **DATABASE_HOST**. If you don't have mongoDB installed locally, and don't have accaunt on MongoDB Atlas with cloude managed database, your can deploy mongoDB locally using **docker** (you should have **already installed docker, docker-compose**). To perform it, **first of all** create in root dir **.env** file like **.env.example** (**just copy data from .env.example to .env**) and **then** in the project **root** dir run:
 
 ```bash
 $ docker-compose up
