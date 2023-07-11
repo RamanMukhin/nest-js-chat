@@ -15,13 +15,19 @@ export class Room extends Document {
   @Prop()
   _id: string;
 
-  @Prop()
+  @Prop({ required: true })
   name: string;
 
-  @Prop({ type: SchemaTypes.ObjectId, ref: User.name })
+  @Prop({ type: SchemaTypes.ObjectId, ref: User.name, required: true })
   creatorId: string;
 
-  @Prop({ type: [SchemaTypes.ObjectId], ref: User.name })
+  @Prop({
+    participant: {
+      type: [SchemaTypes.ObjectId],
+      ref: User.name,
+      required: true,
+    },
+  })
   participants: string[];
 
   @Prop()

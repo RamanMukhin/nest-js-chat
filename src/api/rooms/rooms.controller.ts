@@ -25,6 +25,7 @@ import { JwtAuthGuard } from '../auth/utils/jwt-auth.quard';
 import { RequestWithUser } from 'src/common/custom.request';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { RoomResponse } from './responses/room.response';
+import { RoomWithMessagesResponse } from './responses/room-with-messages.response';
 
 @ApiTags('rooms')
 @ApiBearerAuth()
@@ -49,11 +50,11 @@ export class RoomsController {
   }
 
   @Get(':id')
-  @ApiOkResponse({ type: RoomResponse })
+  @ApiOkResponse({ type: RoomWithMessagesResponse })
   findOne(
     @Param('id') id: string,
     @Query() paginationDto: PaginationDto,
-  ): Promise<RoomResponse> {
+  ): Promise<RoomWithMessagesResponse> {
     return this.roomsService.findOne(id, paginationDto);
   }
 

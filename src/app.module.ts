@@ -5,6 +5,7 @@ import { UsersModule } from './api/users/users.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { RoomsModule } from './api/rooms/rooms.module';
 import { MessagesModule } from './api/messages/messages.module';
+import { AppGateway } from './app.gateway';
 
 @Module({
   imports: [
@@ -15,5 +16,6 @@ import { MessagesModule } from './api/messages/messages.module';
     RoomsModule,
     MessagesModule,
   ],
+  providers: [AppGateway],
 })
 export class AppModule {}

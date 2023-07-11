@@ -11,16 +11,16 @@ export class Message extends Document {
   @Prop()
   _id: string;
 
-  @Prop()
+  @Prop({ required: true })
   type: MessageTypesEnum;
 
-  @Prop({ type: SchemaTypes.ObjectId, ref: Room.name })
+  @Prop({ type: SchemaTypes.ObjectId, ref: Room.name, required: true })
   roomId: string;
 
-  @Prop({ type: SchemaTypes.ObjectId, ref: User.name })
+  @Prop({ type: SchemaTypes.ObjectId, ref: User.name, required: true })
   creatorId: string;
 
-  @Prop()
+  @Prop({ required: true })
   data: string;
 
   @Prop()

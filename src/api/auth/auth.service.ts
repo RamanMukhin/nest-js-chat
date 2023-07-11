@@ -116,4 +116,12 @@ export class AuthService {
 
     return { accessToken, refreshToken };
   }
+
+  public async validateToken(token: string): Promise<UserResponse> {
+    const payload: UserResponse = await this.jwtService.verifyAsync(token, {
+      secret: process.env.ACCESS_TOKEN_SECRETE,
+    });
+
+    return payload;
+  }
 }

@@ -5,16 +5,16 @@ export type AuthDocument = HydratedDocument<Auth>;
 
 @Schema({ versionKey: false, timestamps: true })
 export class Auth extends Document {
-  //   @Prop()
-  //   _id: string;
-
   @Prop()
+  _id: string;
+
+  @Prop({ required: true })
   userId: string;
 
   @Prop()
   refreshToken: string;
 
-  @Prop()
+  @Prop({ required: true })
   fingerprint: string;
 
   @Prop()

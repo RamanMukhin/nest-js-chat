@@ -40,10 +40,20 @@ export class RoomsService {
     return rooms.map((room) => room.toObject());
   }
 
+  public async findRoomIdsByParticipantId(
+    participantId: string,
+  ): Promise<string[]> {
+    const rooms = await this.roomModel
+      .find({ participants: new Types.ObjectId(participantId) })
+      .exec();
+
+    return rooms.map((room) => room.toObject()._id);
+  }
+
   public async findOne(
     id: string,
     paginationDto: PaginationDto = { page: '1', size: '1' },
-  ): Promise<Room | (Room & { messages: MessageResponse[] })> {
+  ): Promise<Room & { messages: MessageResponse[] }> {
     const page = (paginationDto.page && +paginationDto.page) || 1;
     const size = (paginationDto.size && +paginationDto.size) || 100;
     const offset = (page - 1) * size;
@@ -63,7 +73,7 @@ export class RoomsService {
       throw new NotFoundException(`Room with id=${id} not found`);
     }
 
-    return room;
+    return room.toObject();
   }
 
   public async update(id: string, updateRoomDto: UpdateRoomDto) {

@@ -9,10 +9,10 @@ export class User extends Document {
   @Prop()
   _id: string;
 
-  @Prop({ unique: true })
+  @Prop({ unique: true, required: true })
   login: string;
 
-  @Prop()
+  @Prop({ required: true })
   password: string;
 
   @Prop()
