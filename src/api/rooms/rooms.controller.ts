@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Body,
   Patch,
   Param,
@@ -65,6 +66,15 @@ export class RoomsController {
     @Body() updateRoomDto: UpdateRoomDto,
   ): Promise<RoomResponse> {
     return this.roomsService.update(id, updateRoomDto);
+  }
+
+  @Put(':id')
+  @ApiOkResponse({ type: RoomResponse })
+  joinRoom(
+    @Param('id') id: string,
+    @Req() req: RequestWithUser,
+  ): Promise<RoomResponse> {
+    return this.roomsService.joinRoom(id, req.user._id);
   }
 
   @Delete(':id')

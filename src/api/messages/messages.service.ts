@@ -11,6 +11,7 @@ import { Message } from './entities/message.entity';
 import { RETURN_NEW_OPTION } from 'src/common/constants';
 import { RoomsService } from '../rooms/rooms.service';
 import { SearchInMessageWitPaginationDto } from './dto/search-in-message.dto';
+import { getPagination } from 'src/common/utils';
 
 @Injectable()
 export class MessagesService {
@@ -51,15 +52,7 @@ export class MessagesService {
   public async findAll(
     searchInMessageWitPaginationDto: SearchInMessageWitPaginationDto,
   ): Promise<Message[]> {
-    const page =
-      (searchInMessageWitPaginationDto.page &&
-        +searchInMessageWitPaginationDto.page) ||
-      1;
-    const size =
-      (searchInMessageWitPaginationDto.size &&
-        +searchInMessageWitPaginationDto.size) ||
-      100;
-    const offset = (page - 1) * size;
+    const { limit, skip } = getPagination(searchInMessageWitPaginationDto);
 
     const { search: searchString } = searchInMessageWitPaginationDto;
 
@@ -77,8 +70,8 @@ export class MessagesService {
 
     const messages = await this.messageModel
       .find(filter)
-      .limit(size)
-      .skip(offset)
+      .limit(limit)
+      .skip(skip)
       .exec();
 
     return messages.map((message) => message.toObject());

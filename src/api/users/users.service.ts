@@ -13,6 +13,7 @@ import { RETURN_NEW_OPTION, SALT_ROUNDS } from '../../common/constants';
 import { UserResponse } from './responses/user.response';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { mongoExistsType } from 'src/common/types';
+import { getPagination } from 'src/common/utils';
 
 @Injectable()
 export class UsersService {
@@ -59,11 +60,9 @@ export class UsersService {
   }
 
   public async findAll(paginationDto: PaginationDto): Promise<UserResponse[]> {
-    const page = (paginationDto.page && +paginationDto.page) || 1;
-    const size = (paginationDto.size && +paginationDto.size) || 100;
-    const offset = (page - 1) * size;
+    const { limit, skip } = getPagination(paginationDto);
 
-    const users = await this.userModel.find().limit(size).skip(offset).exec();
+    const users = await this.userModel.find().limit(limit).skip(skip).exec();
 
     return users.map((user) => User.getResponse(user.toObject()));
   }

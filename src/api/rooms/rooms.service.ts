@@ -7,6 +7,7 @@ import { Room } from './entities/room.entity';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { RETURN_NEW_OPTION } from 'src/common/constants';
 import { MessageResponse } from '../messages/responses/message.response';
+import { getPagination } from 'src/common/utils';
 
 @Injectable()
 export class RoomsService {
@@ -31,11 +32,9 @@ export class RoomsService {
   }
 
   public async findAll(paginationDto: PaginationDto): Promise<Room[]> {
-    const page = (paginationDto.page && +paginationDto.page) || 1;
-    const size = (paginationDto.size && +paginationDto.size) || 100;
-    const offset = (page - 1) * size;
+    const { limit, skip } = getPagination(paginationDto);
 
-    const rooms = await this.roomModel.find().limit(size).skip(offset).exec();
+    const rooms = await this.roomModel.find().limit(limit).skip(skip).exec();
 
     return rooms.map((room) => room.toObject());
   }
@@ -54,18 +53,13 @@ export class RoomsService {
     id: string,
     paginationDto: PaginationDto = { page: '1', size: '1' },
   ): Promise<Room & { messages: MessageResponse[] }> {
-    const page = (paginationDto.page && +paginationDto.page) || 1;
-    const size = (paginationDto.size && +paginationDto.size) || 100;
-    const offset = (page - 1) * size;
+    const { limit, skip } = getPagination(paginationDto);
 
     const room = await this.roomModel
       .findById(id)
       .populate({
         path: 'messages',
-        options: {
-          limit: size,
-          skip: offset,
-        },
+        options: { limit, skip },
       })
       .exec();
 
@@ -76,7 +70,7 @@ export class RoomsService {
     return room.toObject();
   }
 
-  public async update(id: string, updateRoomDto: UpdateRoomDto) {
+  public async update(id: string, updateRoomDto: UpdateRoomDto): Promise<Room> {
     const room = await this.findOne(id);
 
     const dataToUpdate: UpdateRoomDto = {
@@ -85,6 +79,33 @@ export class RoomsService {
 
     const updatedRoom = await this.roomModel
       .findByIdAndUpdate(id, dataToUpdate, RETURN_NEW_OPTION)
+      .exec();
+
+    return updatedRoom;
+  }
+
+  public async joinRoom(roomId: string, userId: string): Promise<Room> {
+    const room = await this.roomModel.findById(roomId).exec();
+
+    if (!room) {
+      throw new NotFoundException(`Room with id=${roomId} not found`);
+    }
+
+    if (
+      room
+        .toObject()
+        .participants.filter((userObjectId) => `${userObjectId}` === userId)
+        .length
+    ) {
+      return room.toObject();
+    }
+
+    const dataToUpdate = {
+      participants: [...room.participants, new Types.ObjectId(userId)],
+    };
+
+    const updatedRoom = await this.roomModel
+      .findByIdAndUpdate(roomId, dataToUpdate, RETURN_NEW_OPTION)
       .exec();
 
     return updatedRoom;
