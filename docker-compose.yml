@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+
+# Database container
+  db:
+    image: mongo
+    container_name: db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+    ports:
+      - 27017:27017
+    volumes:
+      - ./docker-compose/mongo/data:/data/mongo
+    restart: always
