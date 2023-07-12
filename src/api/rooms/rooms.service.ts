@@ -5,7 +5,7 @@ import { UpdateRoomDto } from './dto/update-room.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Room } from './entities/room.entity';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { RETURN_NEW_OPTION } from 'src/common/constants';
+import { PaginationDefault, RETURN_NEW_OPTION } from 'src/common/constants';
 import { MessageResponse } from '../messages/responses/message.response';
 import { getPagination } from 'src/common/utils';
 
@@ -51,7 +51,7 @@ export class RoomsService {
 
   public async findOne(
     id: string,
-    paginationDto: PaginationDto = { page: '1', size: '1' },
+    paginationDto: PaginationDto = PaginationDefault,
   ): Promise<Room & { messages: MessageResponse[] }> {
     const { limit, skip } = getPagination(paginationDto);
 
