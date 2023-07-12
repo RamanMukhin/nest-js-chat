@@ -6,6 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { RoomsModule } from './api/rooms/rooms.module';
 import { MessagesModule } from './api/messages/messages.module';
 import { AppGateway } from './app.gateway';
+import { FilesModule } from './api/files/files.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { AppGateway } from './app.gateway';
     UsersModule,
     RoomsModule,
     MessagesModule,
+    FilesModule,
   ],
   providers: [AppGateway],
 })

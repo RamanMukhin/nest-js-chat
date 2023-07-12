@@ -3,6 +3,7 @@ import { STATUS_CODES as statusCodes } from 'http';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
+  OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
@@ -20,7 +21,9 @@ import { CreateMessageDto } from './api/messages/dto/create-message.dto';
 
 @UseGuards(WsJwtAuthGuard)
 @WebSocketGateway()
-export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class AppGateway
+  implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
+{
   @WebSocketServer()
   private readonly server: Server;
 
@@ -30,6 +33,10 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly roomsService: RoomsService,
     private readonly messagesService: MessagesService,
   ) {}
+
+  afterInit(server: any) {
+    this.messagesService.setServer(server);
+  }
 
   async handleConnection(client: Socket) {
     const authHeader: string = client.handshake?.headers?.authorization;
@@ -72,7 +79,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @UsePipes(new ValidationPipe())
   @SubscribeMessage('sendMessage')
   async send(client: Socket, createMessageDto: CreateMessageDto) {
-    const message = await this.messagesService.create(
+    await this.messagesService.create(
       {
         data: createMessageDto.data,
         roomId: createMessageDto.roomId,
@@ -80,7 +87,5 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
       },
       (client.handshake as any).user._id,
     );
-
-    this.server.to(createMessageDto.roomId).emit('newMessage', message);
   }
 }

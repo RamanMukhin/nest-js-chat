@@ -1,4 +1,5 @@
 import { Model, Types } from 'mongoose';
+import { Server } from 'socket.io';
 import {
   BadRequestException,
   Injectable,
@@ -15,10 +16,16 @@ import { getPagination } from 'src/common/utils';
 
 @Injectable()
 export class MessagesService {
+  private server: Server;
+
   constructor(
     @InjectModel(Message.name) private readonly messageModel: Model<Message>,
     private readonly roomsService: RoomsService,
   ) {}
+
+  public setServer(server: Server) {
+    this.server = server;
+  }
 
   private async checkRoom(roomId: string): Promise<void> {
     try {
@@ -45,6 +52,8 @@ export class MessagesService {
     });
 
     await createdMessage.save();
+
+    this.server.to(createMessageDto.roomId).emit('newMessage', createdMessage);
 
     return createdMessage;
   }
