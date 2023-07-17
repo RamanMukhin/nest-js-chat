@@ -20,7 +20,7 @@ import { AuthService } from './api/auth/auth.service';
 import { CreateMessageDto } from './api/messages/dto/create-message.dto';
 
 @UseGuards(WsJwtAuthGuard)
-@WebSocketGateway()
+@WebSocketGateway({ cors: true })
 export class AppGateway
   implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
 {
