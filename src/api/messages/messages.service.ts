@@ -1,4 +1,4 @@
-import { Model, Types } from 'mongoose';
+import { Model, Types, FilterQuery } from 'mongoose';
 import { Server } from 'socket.io';
 import {
   BadRequestException,
@@ -11,7 +11,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Message } from './entities/message.entity';
 import { RETURN_NEW_OPTION } from 'src/common/constants';
 import { RoomsService } from '../rooms/rooms.service';
-import { SearchInMessageWitPaginationDto } from './dto/search-in-message.dto';
+import { SearchInRoomOrMessageWitPaginationDto } from './dto/search-in-message.dto';
 import { getPagination } from 'src/common/utils';
 
 @Injectable()
@@ -59,13 +59,16 @@ export class MessagesService {
   }
 
   public async findAll(
-    searchInMessageWitPaginationDto: SearchInMessageWitPaginationDto,
+    searchInRoomOrMessageWitPaginationDto: SearchInRoomOrMessageWitPaginationDto,
   ): Promise<Message[]> {
-    const { limit, skip } = getPagination(searchInMessageWitPaginationDto);
+    const { limit, skip } = getPagination(
+      searchInRoomOrMessageWitPaginationDto,
+    );
 
-    const { search: searchString } = searchInMessageWitPaginationDto;
+    const { search: searchString, roomId } =
+      searchInRoomOrMessageWitPaginationDto;
 
-    const filter = searchString
+    const filter: FilterQuery<Message> = searchString
       ? {
           $or:
             searchString.length >= +(process.env.MIN_TEXT_SEARCH_LENGTH ?? 3)
@@ -77,8 +80,13 @@ export class MessagesService {
         }
       : {};
 
+    if (roomId) {
+      filter.roomId = roomId;
+    }
+
     const messages = await this.messageModel
       .find(filter)
+      .sort({ createdAt: 1 })
       .limit(limit)
       .skip(skip)
       .exec();

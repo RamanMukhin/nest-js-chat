@@ -24,7 +24,7 @@ import {
 import { JwtAuthGuard } from '../auth/utils/jwt-auth.quard';
 import { RequestWithUser } from 'src/common/custom.request';
 import { MessageResponse } from './responses/message.response';
-import { SearchInMessageWitPaginationDto } from './dto/search-in-message.dto';
+import { SearchInRoomOrMessageWitPaginationDto } from './dto/search-in-message.dto';
 
 @ApiTags('messages')
 @ApiBearerAuth()
@@ -45,7 +45,8 @@ export class MessagesController {
   @Get()
   @ApiOkResponse({ type: [MessageResponse] })
   findAll(
-    @Query() searchInMessageWitPaginationDto: SearchInMessageWitPaginationDto,
+    @Query()
+    searchInMessageWitPaginationDto: SearchInRoomOrMessageWitPaginationDto,
   ): Promise<MessageResponse[]> {
     return this.messagesService.findAll(searchInMessageWitPaginationDto);
   }
