@@ -18,6 +18,7 @@ import { MessagesService } from './api/messages/messages.service';
 import { MessageTypesEnum } from './api/messages/enum/message-type.enum';
 import { AuthService } from './api/auth/auth.service';
 import { CreateMessageDto } from './api/messages/dto/create-message.dto';
+import { MessageResponse } from './api/messages/responses/message.response';
 
 @UseGuards(WsJwtAuthGuard)
 @WebSocketGateway({ cors: true })
@@ -39,11 +40,12 @@ export class AppGateway
   }
 
   async handleConnection(client: Socket) {
-    const authHeader: string = client.handshake?.headers?.authorization;
+    const authHeader: string =
+      client.handshake?.auth?.token || client.handshake?.headers?.authorization;
     const token = authHeader && authHeader.split(' ')[1];
 
     if (!token) {
-      client.disconnect();
+      return client.disconnect();
     }
 
     try {
@@ -64,6 +66,7 @@ export class AppGateway
       );
 
       await client.join(roomIds);
+      console.log('Connected:     ', client.id);
     } catch (err) {
       console.log(err);
       throw new WsException(
@@ -78,8 +81,11 @@ export class AppGateway
 
   @UsePipes(new ValidationPipe())
   @SubscribeMessage('sendMessage')
-  async send(client: Socket, createMessageDto: CreateMessageDto) {
-    await this.messagesService.create(
+  async send(
+    client: Socket,
+    createMessageDto: CreateMessageDto,
+  ): Promise<MessageResponse> {
+    const createdMessage = await this.messagesService.create(
       {
         data: createMessageDto.data,
         roomId: createMessageDto.roomId,
@@ -87,5 +93,7 @@ export class AppGateway
       },
       (client.handshake as any).user._id,
     );
+
+    return createdMessage;
   }
 }

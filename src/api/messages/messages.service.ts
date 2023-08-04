@@ -11,6 +11,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Message } from './entities/message.entity';
 import { RETURN_NEW_OPTION } from 'src/common/constants';
 import { RoomsService } from '../rooms/rooms.service';
+import { ConfigService } from '@nestjs/config';
 import { SearchInRoomOrMessageWitPaginationDto } from './dto/search-in-message.dto';
 import { getPagination } from 'src/common/utils';
 
@@ -21,6 +22,7 @@ export class MessagesService {
   constructor(
     @InjectModel(Message.name) private readonly messageModel: Model<Message>,
     private readonly roomsService: RoomsService,
+    private readonly configService: ConfigService,
   ) {}
 
   public setServer(server: Server) {
@@ -46,14 +48,20 @@ export class MessagesService {
     await this.checkRoom(createMessageDto.roomId);
 
     const createdMessage = new this.messageModel({
+      ...createMessageDto,
       _id: new Types.ObjectId(),
       creatorId,
-      ...createMessageDto,
+      createdAt: createMessageDto.createdAt
+        ? createMessageDto.createdAt
+        : new Date(),
     });
 
-    await createdMessage.save();
+    await this.server
+      .to(createMessageDto.roomId)
+      .timeout(3000)
+      .emitWithAck('newMessage', createdMessage);
 
-    this.server.to(createMessageDto.roomId).emit('newMessage', createdMessage);
+    await createdMessage.save();
 
     return createdMessage;
   }
@@ -71,7 +79,8 @@ export class MessagesService {
     const filter: FilterQuery<Message> = searchString
       ? {
           $or:
-            searchString.length >= +(process.env.MIN_TEXT_SEARCH_LENGTH ?? 3)
+            searchString.length >=
+            +(this.configService.get<number>('MIN_TEXT_SEARCH_LENGTH') ?? 3)
               ? [
                   { $text: { $search: searchString } },
                   { data: { $regex: searchString } },
@@ -86,7 +95,7 @@ export class MessagesService {
 
     const messages = await this.messageModel
       .find(filter)
-      .sort({ createdAt: 1 })
+      .sort({ _id: -1 })
       .limit(limit)
       .skip(skip)
       .exec();

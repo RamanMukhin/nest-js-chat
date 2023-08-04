@@ -7,7 +7,7 @@ import { UserResponse } from 'src/api/users/responses/user.response';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'access-jwt') {
-  constructor(private authService: AuthService) {
+  constructor(private readonly authService: AuthService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: process.env.ACCESS_TOKEN_SECRETE,

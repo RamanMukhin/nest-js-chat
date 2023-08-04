@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDefined, IsEnum, IsString } from 'class-validator';
+import {
+  IsDefined,
+  IsEnum,
+  IsOptional,
+  IsString,
+  IsDateString,
+} from 'class-validator';
 import { MessageTypesEnum } from '../enum/message-type.enum';
 
 export class CreateMessageDto {
@@ -17,4 +23,9 @@ export class CreateMessageDto {
   @IsDefined()
   @IsEnum(MessageTypesEnum)
   type: MessageTypesEnum;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsDateString()
+  createdAt?: MessageTypesEnum;
 }

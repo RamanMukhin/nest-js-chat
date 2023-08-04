@@ -3,6 +3,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Model } from 'mongoose';
 import { UsersService } from '../users/users.service';
 import { SignUpDto } from './dto/sign-up.dto';
@@ -21,6 +22,7 @@ export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly usersService: UsersService,
+    private readonly configService: ConfigService,
     @InjectModel(Auth.name) private readonly authModel: Model<Auth>,
   ) {}
 
@@ -105,12 +107,12 @@ export class AuthService {
 
   public async generateJwtTokens(payload: UserResponse): Promise<AuthResponse> {
     const accessToken = await this.jwtService.signAsync(payload, {
-      secret: process.env.ACCESS_TOKEN_SECRETE,
+      secret: this.configService.get<string>('ACCESS_TOKEN_SECRETE'),
       expiresIn: '1h',
     });
 
     const refreshToken = await this.jwtService.signAsync(payload, {
-      secret: process.env.REFRESH_TOKEN_SECRETE,
+      secret: this.configService.get<string>('REFRESH_TOKEN_SECRETE'),
       expiresIn: '7 days',
     });
 
@@ -119,7 +121,7 @@ export class AuthService {
 
   public async validateToken(token: string): Promise<UserResponse> {
     const payload: UserResponse = await this.jwtService.verifyAsync(token, {
-      secret: process.env.ACCESS_TOKEN_SECRETE,
+      secret: this.configService.get<string>('ACCESS_TOKEN_SECRETE'),
     });
 
     return payload;

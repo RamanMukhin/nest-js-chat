@@ -19,11 +19,12 @@ export class RoomsService {
     createRoomDto: CreateRoomDto,
     creatorId: string,
   ): Promise<Room> {
+    const objectCreatorId = new Types.ObjectId(creatorId);
     const createdRoom = new this.roomModel({
       _id: new Types.ObjectId(),
       ...createRoomDto,
-      creatorId,
-      participants: [creatorId],
+      creatorId: objectCreatorId,
+      participants: [objectCreatorId],
     });
 
     await createdRoom.save();
@@ -59,7 +60,11 @@ export class RoomsService {
       .findById(id)
       .populate({
         path: 'messages',
-        options: { limit, skip },
+        options: {
+          sort: { _id: -1 },
+          limit,
+          skip,
+        },
       })
       .exec();
 

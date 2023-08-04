@@ -3,6 +3,7 @@ import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
@@ -25,7 +26,9 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerModuleConfig);
   SwaggerModule.setup('docs', app, document);
 
-  await app.listen(+process.env.PORT || 3000);
+  const configService = app.get(ConfigService);
+
+  await app.listen(configService.get<number>('PORT') || 3000);
 
   console.log(`Server is running on: ${await app.getUrl()}`);
 }
